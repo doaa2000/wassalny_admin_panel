@@ -3,11 +3,14 @@ import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui.store'
+import { useAuthStore } from '@/stores/auth.store'
+import { env } from '@/core/config/env'
 import { useI18n } from '@/core/composables/useI18n'
 import { PALETTE } from '@/core/constants/palette'
 import BaseIcon from '@/shared/ui/BaseIcon.vue'
 
 const ui = useUiStore()
+const auth = useAuthStore()
 const { theme, locale } = storeToRefs(ui)
 const { t } = useI18n()
 const router = useRouter()
@@ -36,9 +39,16 @@ const profileMenu = [
   { icon: 'logout', labelKey: 'signOut', danger: true },
 ] as const
 
-function onProfileItem(labelKey: string) {
+async function onProfileItem(labelKey: string) {
   closeMenus()
-  if (labelKey === 'profile' || labelKey === 'accountSettings') router.push({ name: 'settings' })
+  if (labelKey === 'profile' || labelKey === 'accountSettings') {
+    router.push({ name: 'settings' })
+  } else if (labelKey === 'signOut') {
+    // In mock mode there is no session to end.
+    if (env.useMock) return
+    await auth.signOut()
+    router.replace({ name: 'login' })
+  }
 }
 </script>
 
