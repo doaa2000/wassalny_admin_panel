@@ -43,11 +43,17 @@ async function onProfileItem(labelKey: string) {
   closeMenus()
   if (labelKey === 'profile' || labelKey === 'accountSettings') {
     router.push({ name: 'settings' })
-  } else if (labelKey === 'signOut') {
-    // In mock mode there is no session to end.
-    if (env.useMock) return
-    await auth.signOut()
-    router.replace({ name: 'login' })
+    return
+  }
+  if (labelKey === 'signOut') {
+    // End the Supabase session in live mode; ignore failures and always leave
+    // for the login screen so logout is reliable in either mode.
+    try {
+      if (!env.useMock) await auth.signOut()
+    } catch {
+      /* already signing out — navigate away regardless */
+    }
+    await router.replace({ name: 'login' })
   }
 }
 </script>
