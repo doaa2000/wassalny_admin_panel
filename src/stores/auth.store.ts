@@ -80,10 +80,16 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signOut(): Promise<void> {
-    await getSupabaseClient().auth.signOut()
-    session.value = null
-    user.value = null
-    role.value = null
+    // Clear local state regardless of the network result so the guard always
+    // sees a signed-out session. `scope: 'local'` ends this device's session
+    // without depending on a server round-trip.
+    try {
+      await getSupabaseClient().auth.signOut({ scope: 'local' })
+    } finally {
+      session.value = null
+      user.value = null
+      role.value = null
+    }
   }
 
   return { user, session, role, loading, error, ready, isAuthenticated, isAdmin, init, signIn, signOut }
