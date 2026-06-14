@@ -17,8 +17,12 @@ import type {
 import * as mock from '@/core/data/datasources/mock'
 import {
   SupabaseApplicationDataSource,
+  SupabaseDashboardDataSource,
   SupabaseDriverDataSource,
+  SupabaseNotificationDataSource,
   SupabasePassengerDataSource,
+  SupabaseReviewDataSource,
+  SupabaseTripDataSource,
 } from '@/core/data/datasources/supabase'
 import {
   AdminRepository,
@@ -71,23 +75,31 @@ function buildRegistry(): RepositoryRegistry {
   const passengerDs = useMock
     ? new mock.MockPassengerDataSource()
     : new SupabasePassengerDataSource()
+  const tripDs = useMock ? new mock.MockTripDataSource() : new SupabaseTripDataSource()
+  const reviewDs = useMock ? new mock.MockReviewDataSource() : new SupabaseReviewDataSource()
+  const notificationDs = useMock
+    ? new mock.MockNotificationDataSource()
+    : new SupabaseNotificationDataSource()
+  const dashboardDs = useMock
+    ? new mock.MockDashboardDataSource()
+    : new SupabaseDashboardDataSource()
 
-  // Remaining domains use the mock data source until their Supabase tables are
-  // provisioned; their repositories are backend-agnostic regardless.
+  // Domains without a Supabase data source yet stay on mock data; their
+  // repositories are backend-agnostic regardless.
   return {
     drivers: new DriverRepository(driverDs),
     applications: new ApplicationRepository(applicationDs),
     passengers: new PassengerRepository(passengerDs),
-    trips: new TripRepository(new mock.MockTripDataSource()),
+    trips: new TripRepository(tripDs),
     locations: new LocationRepository(new mock.MockLocationDataSource()),
     complaints: new ComplaintRepository(new mock.MockComplaintDataSource()),
-    reviews: new ReviewRepository(new mock.MockReviewDataSource()),
+    reviews: new ReviewRepository(reviewDs),
     coupons: new CouponRepository(new mock.MockCouponDataSource()),
     admins: new AdminRepository(new mock.MockAdminDataSource()),
     audit: new AuditRepository(new mock.MockAuditDataSource()),
     pricing: new PricingRepository(new mock.MockPricingDataSource()),
-    notifications: new NotificationRepository(new mock.MockNotificationDataSource()),
-    dashboard: new DashboardRepository(new mock.MockDashboardDataSource()),
+    notifications: new NotificationRepository(notificationDs),
+    dashboard: new DashboardRepository(dashboardDs),
   }
 }
 

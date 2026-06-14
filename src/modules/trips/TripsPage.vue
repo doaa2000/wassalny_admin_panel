@@ -55,8 +55,10 @@ const columns: Column[] = [
   { key: 'actions', label: t('actionsCol'), align: 'end' },
 ]
 
-const driverName = (trip: Trip) => L(SEED_DRIVERS[trip.driver].name)
-const passengerName = (trip: Trip) => L(SEED_PASSENGERS[trip.pass].name)
+const driverName = (trip: Trip) =>
+  trip.driverName ? L(trip.driverName) : SEED_DRIVERS[trip.driver]?.name ? L(SEED_DRIVERS[trip.driver].name) : '—'
+const passengerName = (trip: Trip) =>
+  trip.passengerName ? L(trip.passengerName) : SEED_PASSENGERS[trip.pass]?.name ? L(SEED_PASSENGERS[trip.pass].name) : '—'
 const selected = ref<Trip | null>(null)
 </script>
 
@@ -97,13 +99,13 @@ const selected = ref<Trip | null>(null)
         </td>
         <td class="px-4 py-3.5">
           <div class="flex items-center gap-2.5">
-            <AvatarBadge :name="SEED_DRIVERS[row.driver].name.en" :size="30" />
+            <AvatarBadge :name="driverName(row)" :size="30" />
             <span class="text-[13.5px] font-semibold">{{ driverName(row) }}</span>
           </div>
         </td>
         <td class="px-4 py-3.5">
           <div class="flex items-center gap-2.5">
-            <AvatarBadge :name="SEED_PASSENGERS[row.pass].name.en" :size="30" />
+            <AvatarBadge :name="passengerName(row)" :size="30" />
             <span class="text-[13.5px] font-semibold">{{ passengerName(row) }}</span>
           </div>
         </td>
