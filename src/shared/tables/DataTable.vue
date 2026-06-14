@@ -50,7 +50,7 @@ const showTable = computed(() => !props.loading && !props.error && !props.isEmpt
   <TableSkeleton v-if="loading" />
 
   <div v-else class="overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
-    <ErrorState v-if="error" @retry="emit('retry')" />
+    <ErrorState v-if="error" :body="error.message" @retry="emit('retry')" />
 
     <EmptyState
       v-else-if="isEmpty"

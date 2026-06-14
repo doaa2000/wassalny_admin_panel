@@ -28,6 +28,9 @@ export function useAsyncData<T>(
     try {
       data.value = await fetcher()
     } catch (err) {
+      // Surface the real backend error (PostgREST / RPC message) to the console
+      // so failures are diagnosable instead of hidden behind the generic UI.
+      console.error('[useAsyncData] fetch failed:', err)
       error.value = err instanceof Error ? err : new Error(String(err))
     } finally {
       loading.value = false
