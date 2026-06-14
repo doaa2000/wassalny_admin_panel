@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import AdminLayout from '@/shared/layouts/AdminLayout.vue'
 import type { TranslationKey } from '@/core/constants/i18n'
+import { env } from '@/core/config/env'
+import { useAuthStore } from '@/stores/auth.store'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -8,10 +10,18 @@ declare module 'vue-router' {
     titleKey: TranslationKey
     /** Translation key for the screen subtitle. */
     subKey?: TranslationKey
+    /** Routes reachable without an authenticated admin (e.g. login). */
+    public?: boolean
   }
 }
 
 const routes: RouteRecordRaw[] = [
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/modules/auth/LoginPage.vue'),
+    meta: { titleKey: 'dashboard', public: true },
+  },
   {
     path: '/',
     component: AdminLayout,
@@ -140,4 +150,24 @@ export const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior: () => ({ top: 0 }),
+})
+
+/**
+ * Auth guard. In mock mode the panel is fully open (no backend). In live mode
+ * (`VITE_USE_MOCK=false`) every screen requires an authenticated admin so the
+ * Supabase RLS policies grant access.
+ */
+router.beforeEach(async (to) => {
+  if (env.useMock) return true
+
+  const auth = useAuthStore()
+  if (!auth.ready) await auth.init()
+
+  if (to.meta.public) {
+    return auth.isAuthenticated && auth.isAdmin ? { name: 'dashboard' } : true
+  }
+  if (!auth.isAuthenticated || !auth.isAdmin) {
+    return { name: 'login', query: { redirect: to.fullPath } }
+  }
+  return true
 })

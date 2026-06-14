@@ -45,10 +45,14 @@ export interface Passenger {
 
 export interface Trip {
   id: string
-  /** Driver index into the drivers collection (seed convention). */
+  /** Driver index into the drivers collection (mock seed convention). */
   driver: number
-  /** Passenger index into the passengers collection (seed convention). */
+  /** Passenger index into the passengers collection (mock seed convention). */
   pass: number
+  /** Resolved driver name (live backend). Falls back to the seed index when absent. */
+  driverName?: Localized
+  /** Resolved passenger name (live backend). Falls back to the seed index when absent. */
+  passengerName?: Localized
   from: Localized
   to: Localized
   price: number

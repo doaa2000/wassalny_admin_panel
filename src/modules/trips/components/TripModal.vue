@@ -11,8 +11,16 @@ const props = defineProps<{ open: boolean; trip: Trip | null }>()
 const emit = defineEmits<{ close: [] }>()
 const { t, L } = useI18n()
 
-const driver = computed(() => (props.trip ? L(SEED_DRIVERS[props.trip.driver].name) : ''))
-const passenger = computed(() => (props.trip ? L(SEED_PASSENGERS[props.trip.pass].name) : ''))
+const driver = computed(() => {
+  const t = props.trip
+  if (!t) return ''
+  return t.driverName ? L(t.driverName) : SEED_DRIVERS[t.driver]?.name ? L(SEED_DRIVERS[t.driver].name) : '—'
+})
+const passenger = computed(() => {
+  const t = props.trip
+  if (!t) return ''
+  return t.passengerName ? L(t.passengerName) : SEED_PASSENGERS[t.pass]?.name ? L(SEED_PASSENGERS[t.pass].name) : '—'
+})
 </script>
 
 <template>
