@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Session, User } from '@supabase/supabase-js'
 import { getSupabaseClient } from '@/core/config/supabase'
+import { env } from '@/core/config/env'
 
 /**
  * Authentication state backed by Supabase Auth.
@@ -27,12 +28,16 @@ export const useAuthStore = defineStore('auth', () => {
       role.value = null
       return
     }
-    const { data } = await getSupabaseClient()
+    const { data, error: roleError } = await getSupabaseClient()
       .from('profiles')
       .select('role')
       .eq('id', user.value.id)
-      .single()
+      .maybeSingle()
     role.value = (data?.role as string | undefined) ?? null
+    // Diagnostic: shows which project the panel actually talks to + what came back.
+    // eslint-disable-next-line no-console
+    console.log('[auth] supabaseUrl=', env.supabaseUrl, '| userId=', user.value.id,
+      '| role=', role.value, '| error=', roleError?.message ?? null)
   }
 
   /** Restore any persisted session on app start and subscribe to changes. */
