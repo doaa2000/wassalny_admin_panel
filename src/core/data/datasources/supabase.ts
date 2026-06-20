@@ -288,7 +288,9 @@ export class SupabaseTripDataSource implements TripDataSource {
       id: row.id,
       driver: 0,
       pass: 0,
-      driverName: localized(row.driver?.profile?.full_name ?? 'Unassigned'),
+      driverName: row.driver == null
+        ? localized('Unassigned')
+        : localized(row.driver.profile?.full_name ?? 'Driver'),
       passengerName: localized(row.passenger?.full_name),
       from: localized(row.pickup_address),
       to: localized(row.destination_address),
