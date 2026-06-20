@@ -291,7 +291,7 @@ export class SupabaseTripDataSource implements TripDataSource {
       driverName: row.driver == null
         ? localized('Unassigned')
         : localized(row.driver.profile?.full_name ?? 'Driver'),
-      passengerName: localized(row.passenger?.full_name),
+      passengerName: localized(row.passenger?.full_name ?? 'Passenger'),
       from: localized(row.pickup_address),
       to: localized(row.destination_address),
       price: Number(row.trip_price ?? 0),
